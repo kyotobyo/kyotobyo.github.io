@@ -1,8 +1,13 @@
 ---
-layout:     post title:      SpringBoot学习记录 subtitle:   SpringBoot配置文件、日志框架 date:       2021-08-17 author:     byo
-header-img: img/the-first.png catalog:   true tags:
-
-- spring
+layout:     post 
+title:      SpringBoot学习记录 
+subtitle:   SpringBoot配置文件、日志框架 
+date:       2021-08-17 
+author:     byo
+header-img: img/the-first.png 
+catalog:   true 
+tags:
+    - spring
 
 ---
 
