@@ -1,14 +1,13 @@
 ---
-layout:     post 
-title:      SpringBoot学习记录 
-subtitle:   SpringBoot配置文件、日志框架 
-date:       2021-08-17 
+layout:     post
+title:      SpringBoot
+subtitle:   SpringBoot框架学习
+date:       2021-08-07
 author:     byo
-header-img: img/the-first.png 
-catalog:   true 
+header-img: img/post-bg-miui6.jpg
+catalog: 	  true
 tags:
-    - spring
-
+- spring
 ---
 
 # SpringBoot基础概念
