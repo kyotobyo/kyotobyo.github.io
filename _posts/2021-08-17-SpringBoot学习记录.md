@@ -92,11 +92,11 @@ public class Pet {
 }
 ```
 
-```
+```java
+
 @Component //用于将Person类作为Bean注入到Spring容器中
-@ConfigurationProperties(prefix = "person") 
-//将配置文件中以person开头的属性注入到该类
-中
+@ConfigurationProperties(prefix = "person")
+//将配置文件中以person开头的属性注入到该类中
 public class Person {
     private int id; //id
     private String name; //名称
@@ -135,9 +135,11 @@ person:
   map: { k1: v1,k2: v2 }
   pet: { type: dog,name: 旺财 }
 ```
-###单侧文件属性注入
+
+### 单侧文件属性注入
 
 属性注入常用以下注解：
+
 ```
 @Configuration：声明一个类作为配置类
 @Bean：声明在方法上，将方法的返回值加入Bean容器
@@ -145,11 +147,123 @@ person:
 @ConfigurationProperties(prefix = "jdbc")：批量属性注入,补充前缀，与全局配置文件中的字段匹配；
 @PropertySource("classpath:/jdbc.properties")指定外部属性文件。在类上添加
 ```
+
 使用举例如下,首先在全局配置文件中作以下声明：
-```
+
+```properties
 jdbc.driverClassName=com.mysql.jdbc.Driver
 jdbc.url=jdbc:mysql://127.0.0.1:3306/springboot_h
 jdbc.username=root
 jdbc.password=123
+```
+
+### 第三方bean的属性注入
+
+首先创建一个其他组件类（模拟是第三方组件包里的bean）：
+
+```java
+
+@Data
+public class AnotherComponent {
+    private boolean enabled;
+    private InetAddress remoteAddress;
+}
+```
+
+创建MyService注入属性：
+
+```java
+
+@Configuration
+public class MyService {
+    @ConfigurationProperties("another")
+    @Bean
+    public AnotherComponent anotherComponent() {
+        return new AnotherComponent();
+    }
+}
+```
+
+配置文件：
+
+```properties
+another.enabled=true
+another.remoteAddress=192.168.10.11
+```
+
+## 日志框架
+
+### 统一日志框架使用步骤归纳如下：
+
+1. 排除系统中的其他日志框架。
+2. 使用中间包替换要替换的日志框架。
+3. 导入我们选择的 SLF4J 实现。
+
+### 日志实例
+
+```java
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
+
+/**
+ * 测试日志输出，
+ * SLF4J 日志级别从小到大trace,debug,info,warn,error
+ *
+ */
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class LogbackTest {
+    Logger logger = LoggerFactory.getLogger(getClass());
+
+    @Test
+    public void testLog() {
+        logger.trace("Trace 日志...");
+        logger.debug("Debug 日志...");
+        logger.info("Info 日志...");
+        logger.warn("Warn 日志...");
+        logger.error("Error 日志...");
+    }
+}
+```
+
+输出内容如下所示：
+
+```
+2020-11-16 19:58:43.094 INFO 39940 --- [ main]
+com.lagou.Springboot01DemoApplicationTests : Info 日志...
+2020-11-16 19:58:43.094 WARN 39940 --- [ main]
+com.lagou.Springboot01DemoApplicationTests : Warn 日志...
+2020-11-16 19:58:43.094 ERROR 39940 --- [ main]
+com.lagou.Springboot01DemoApplicationTests : Error 日志...
+```
+
+已知日志级别从小到大为 trace < debug < info < warn < error . Spring Boot 默认日志级别为 INFO. 由此也可得出Spring Boot的日志格式如下：
+
+```
+%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{50} - %msg%n
+# %d{yyyy-MM-dd HH:mm:ss.SSS} 时间
+# %thread 线程名称
+# %-5level 日志级别从左显示5个字符宽度
+# %logger{50} 类名
+# %msg%n 日志信息加换行
+```
+
+我们也可以在全局配置文件中自定义日志格式：
+
+```properties
+# 日志配置
+# 指定具体包的日志级别
+logging.level.com.lagou=debug
+# 控制台和日志文件输出格式
+logging.pattern.console=%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level
+%logger{50} - %msg%n
+logging.pattern.file=%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{50}- %msg%n
+# 日志输出路径，默认文件spring.log
+logging.file.path=spring.log
+#logging.file.name=log.log
 ```
 
