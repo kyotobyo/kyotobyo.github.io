@@ -79,11 +79,11 @@ spring.config.use-legacy-processing = true)
 3、创建SpringBoot项目时，一般的配置文件放置在“项目的resources目录下”
 ```
 
-### 属性注入
+### 全局配置文件中属性注入
 
 举例，如果想为以下两个类注入属性
 
-```
+```java
 public class Pet {
     private String type;
     private String name;
@@ -91,3 +91,65 @@ public class Pet {
     // 省略toString()方法
 }
 ```
+
+```
+@Component //用于将Person类作为Bean注入到Spring容器中
+@ConfigurationProperties(prefix = "person") 
+//将配置文件中以person开头的属性注入到该类
+中
+public class Person {
+    private int id; //id
+    private String name; //名称
+    private List hobby; //爱好
+    private String[] family; //家庭成员
+    private Map map;
+    private Pet pet; //宠物
+    // 省略属性getXX()和setXX()方法
+    // 省略toString()方法
+}
+```
+
+@ConfigurationProperties(prefix = "person")注解的作用是将配置文件中以person开头的属性值通过setXX()方法注入到实体类对应属性中;
+@Component注解的作用是将当前注入属性值的Person类对象作为Bean组件放到Spring容器中，只有 这样才能被@ConfigurationProperties注解进行赋值。
+
+随后在pom.xml中添加如下依赖，并重启项目，以便在配置文件中注入属性时，有自动补全提示！
+
+```xml
+
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-configuration-processor</artifactId>
+    <optional>true</optional>
+</dependency>
+```
+
+各属性的注入格式如下：
+
+```yaml
+#对实体类对象Person进行属性配置
+person:
+  id: 1
+  name: lucy
+  hobby: [ 吃饭，睡觉，打豆豆 ]
+  family: [ father,mother ]
+  map: { k1: v1,k2: v2 }
+  pet: { type: dog,name: 旺财 }
+```
+###单侧文件属性注入
+
+属性注入常用以下注解：
+```
+@Configuration：声明一个类作为配置类
+@Bean：声明在方法上，将方法的返回值加入Bean容器
+@Value：属性注入
+@ConfigurationProperties(prefix = "jdbc")：批量属性注入,补充前缀，与全局配置文件中的字段匹配；
+@PropertySource("classpath:/jdbc.properties")指定外部属性文件。在类上添加
+```
+使用举例如下,首先在全局配置文件中作以下声明：
+```
+jdbc.driverClassName=com.mysql.jdbc.Driver
+jdbc.url=jdbc:mysql://127.0.0.1:3306/springboot_h
+jdbc.username=root
+jdbc.password=123
+```
+
